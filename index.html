@@ -28,7 +28,7 @@
             justify-content: center;
         }
 
-        /* ФОН */
+        /* ФОН (ОБЩИЙ) */
         .bg { position: fixed; width: 100%; height: 100%; overflow: hidden; z-index: 0; }
         .blob { 
             position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; 
@@ -38,30 +38,36 @@
         .blob:nth-child(2) { width: 300px; height: 300px; background: #cccccc; bottom: 10%; right: -10%; animation-duration: 1.5s; }
         @keyframes moveFast { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(50px, 60px) scale(1.2); } }
 
-        /* ЗАГРУЗКА */
+        /* ЗАГРУЗКА (ТЕПЕРЬ С ФОНОМ) */
         #loader {
-            position: fixed; inset: 0; background: rgba(5, 5, 5, 1); z-index: 100;
+            position: fixed; inset: 0; 
+            background: rgba(5, 5, 5, 0.85); /* Полупрозрачный, чтобы видеть фон */
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 100;
             display: flex; align-items: center; justify-content: center;
             transition: opacity 0.8s ease;
         }
         .spinner {
-            width: 45px; height: 45px; border: 3px solid rgba(255,255,255,0.1);
+            width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1);
             border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* МУЗЫКАЛЬНЫЙ ПЛЕЕР (БОЛЬШЕ И С ПОЛОСКАМИ) */
+        /* МУЗЫКАЛЬНЫЙ ПЛЕЕР (ЕЩЕ БОЛЬШЕ) */
         .music-widget {
-            position: fixed; top: 20px; right: 20px; z-index: 50;
+            position: fixed; top: 25px; right: 25px; z-index: 50;
             background: var(--glass-bg); border: 1px solid var(--glass-border);
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            padding: 12px 18px; border-radius: 20px;
-            display: flex; align-items: center; gap: 14px;
-            min-width: 200px; opacity: 0; transform: translateX(20px); transition: 0.8s ease 1s;
+            padding: 16px 24px; /* Больше отступы */
+            border-radius: 25px;
+            display: flex; align-items: center; gap: 18px; /* Больше зазор */
+            min-width: 250px; /* Больше ширина */
+            opacity: 0; transform: translateX(20px); transition: 0.8s ease;
         }
         .music-widget.show { opacity: 1; transform: translateX(0); }
         .music-icon {
-            width: 40px; height: 40px; border-radius: 50%;
+            width: 55px; height: 55px; /* Больше иконка */
+            border-radius: 50%;
             background: url('iconmusic.png') center/cover;
             border: 2px solid var(--glass-border);
             animation: rotateDisk 4s linear infinite;
@@ -70,13 +76,12 @@
         }
         .playing .music-icon { animation-play-state: running; }
         .music-info { display: flex; flex-direction: column; flex-grow: 1; }
-        .music-name { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
+        .music-name { font-size: 15px; font-weight: 800; margin-bottom: 6px; } /* Больше текст */
         
-        /* ПОЛОСКИ ЭКВАЛАЙЗЕРА */
         .wave-container {
-            display: flex; align-items: flex-end; gap: 2px; height: 12px;
+            display: flex; align-items: flex-end; gap: 3px; height: 16px; /* Выше полоски */
         }
-        .bar { width: 3px; background: #fff; border-radius: 1px; height: 2px; }
+        .bar { width: 4px; background: #fff; border-radius: 1.5px; height: 2px; } /* Жирнее полоски */
         .playing .bar { animation: dance 1s ease-in-out infinite; }
         .bar:nth-child(1) { animation-delay: 0.1s; }
         .bar:nth-child(2) { animation-delay: 0.3s; }
@@ -84,7 +89,7 @@
         .bar:nth-child(4) { animation-delay: 0.4s; }
         .bar:nth-child(5) { animation-delay: 0.1s; }
 
-        @keyframes dance { 0%, 100% { height: 2px; } 50% { height: 12px; } }
+        @keyframes dance { 0%, 100% { height: 2px; } 50% { height: 16px; } }
         @keyframes rotateDisk { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         /* КОНТЕЙНЕР */
@@ -99,9 +104,11 @@
         .seq-item.show { animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
+        /* АВАТАРКА (СБЛИЖЕНИЕ) */
         .avatar {
             width: 100px; height: 100px; border-radius: 50%;
-            background: url('osnova.png') center/cover;
+            /* ПРИБЛИЗИЛ КАРТИНКУ, ЧТОБЫ УБРАТЬ ПОЛОСКИ ПО КРАЯМ */
+            background: url('osnova.png') center/130% no-repeat; /* 130% масштаба */
             border: 2px solid var(--glass-border); margin: 0 auto 20px auto;
         }
         .name { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
@@ -176,10 +183,18 @@
         
         function checkLoading() {
             assetsLoaded++;
+            // Если всё загрузилось, сразу пробуем показать контент
             if (assetsLoaded >= assetsToLoad.length) {
-                setTimeout(showContent, 2000);
+                setTimeout(showContent, 500); // Небольшая задержка для плавности
             }
         }
+
+        // Страховочный таймер: если сеть тупит, через 5 сек всё равно покажем био
+        const fallbackTimer = setTimeout(() => {
+            if (document.getElementById('loader').style.display !== 'none') {
+                showContent();
+            }
+        }, 5000);
 
         assetsToLoad.forEach(src => {
             if (src.endsWith('.mp3')) {
@@ -189,34 +204,36 @@
                 const img = new Image();
                 img.src = src;
                 img.onload = checkLoading;
-                img.onerror = checkLoading;
+                img.onerror = checkLoading; // Если иконки нет, не виснем
             }
         });
 
         function showContent() {
+            clearTimeout(fallbackTimer); // Отменяем страховку
             document.getElementById('loader').style.opacity = '0';
+            
             setTimeout(() => {
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
                 widget.classList.add('show');
                 document.querySelectorAll('.seq-item').forEach(item => item.classList.add('show'));
                 
-                // Пробуем запустить музыку сразу после загрузки
+                // Агрессивный запуск музыки
                 audio.play().then(() => {
                     widget.classList.add('playing');
                 }).catch(() => {
-                    console.log("Ждем клика юзера для звука");
+                    console.log("Автоплей заблочен, ждем тапа.");
                 });
             }, 800);
         }
 
-        // Запасной запуск при любом тапе
+        // Гарантированный запуск при любом клике/тапе
         document.body.addEventListener('click', () => {
             if (audio.paused) {
                 audio.play();
                 widget.classList.add('playing');
             }
-        });
+        }, { once: false }); // Пусть срабатывает всегда, если музыка на паузе
     </script>
 </body>
 </html>

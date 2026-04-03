@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bio Web App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --accent-gray: rgba(255, 255, 255, 0.03);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background: #050505;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ФОН */
+        .bg { position: fixed; width: 100%; height: 100%; overflow: hidden; z-index: 0; }
+        .blob { 
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; 
+            animation: moveFast 2s infinite alternate ease-in-out; 
+        }
+        .blob:nth-child(1) { width: 350px; height: 350px; background: #ffffff; top: 10%; left: -10%; }
+        .blob:nth-child(2) { width: 300px; height: 300px; background: #cccccc; bottom: 10%; right: -10%; animation-duration: 1.5s; }
+        
+        @keyframes moveFast { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(50px, 60px) scale(1.2); } }
+
+        /* ЗАГРУЗКА */
+        #loader {
+            position: fixed; inset: 0; background: rgba(5, 5, 5, 1); z-index: 100;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+        .spinner {
+            width: 45px; height: 45px; border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        .load-text { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* МУЗЫКАЛЬНЫЙ ПЛЕЕР (TOP RIGHT) */
+        .music-widget {
+            position: fixed; top: 20px; right: 20px; z-index: 50;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            padding: 8px 12px; border-radius: 15px;
+            display: flex; align-items: center; gap: 10px;
+            max-width: 180px; opacity: 0; transform: translateX(20px); transition: 0.8s ease 1s;
+        }
+        .music-widget.show { opacity: 1; transform: translateX(0); }
+        .music-icon {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: url('iconmusic.png') center/cover;
+            border: 1px solid var(--glass-border);
+            animation: rotateDisk 3s linear infinite;
+            animation-play-state: paused;
+        }
+        .playing .music-icon { animation-play-state: running; }
+        .music-info { overflow: hidden; display: flex; flex-direction: column; }
+        .music-name { font-size: 10px; font-weight: 800; white-space: nowrap; }
+        .music-status { font-size: 8px; color: var(--text-muted); text-transform: uppercase; }
+
+        @keyframes rotateDisk { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* КОНТЕЙНЕР */
+        #mainContent {
+            position: relative; z-index: 10; width: 90%; max-width: 400px;
+            padding: 40px 30px; background: var(--glass-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 30px;
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: none;
+        }
+
+        .seq-item { opacity: 0; transform: translateY(20px); }
+        .seq-item.show { animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* АВАТАРКА */
+        .avatar {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: url('osnova.png') center/cover;
+            border: 2px solid var(--glass-border); margin: 0 auto 20px auto;
+        }
+
+        /* ТЕКСТ И ГЛИТЧ */
+        .name { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+        .username { font-size: 19px; font-weight: 600; margin-bottom: 12px; display: block; }
+        .glitch-text {
+            display: inline-block; background: linear-gradient(90deg, #fff 0%, #444 30%, #fff 60%, #111 80%, #fff 100%);
+            background-size: 200% auto; color: transparent; -webkit-background-clip: text;
+            animation: shimmer 3s linear infinite, glitch-skew 4s infinite;
+        }
+        @keyframes shimmer { to { background-position: 200% center; } }
+        @keyframes glitch-skew {
+            0%, 93%, 100% { transform: skew(0deg); filter: none; }
+            94% { transform: skew(-10deg); filter: drop-shadow(2px 0 0 rgba(255,255,255,0.4)); }
+            96% { transform: skew(10deg); filter: drop-shadow(-2px 0 0 rgba(0,0,0,0.8)); }
+        }
+
+        .bio { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; }
+
+        /* ПРОЕКТЫ */
+        .section-title { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        .project-card {
+            display: flex; align-items: center; gap: 15px; padding: 15px;
+            background: var(--accent-gray); border: 1px solid var(--glass-border);
+            border-radius: 20px; text-align: left; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .project-card:active, .project-card:hover { 
+            background: rgba(255,255,255,0.1); transform: scale(1.02) translateY(-2px);
+            border-color: rgba(255,255,255,0.3);
+        }
+        .project-icon {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: url('canal.png') center/cover;
+            border: 1px solid var(--glass-border); flex-shrink: 0;
+        }
+        .project-title-glitch { font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
+        .project-link { font-size: 13px; color: rgba(255,255,255,0.5); }
+    </style>
+</head>
+<body>
+
+    <div class="bg"><div class="blob"></div><div class="blob"></div></div>
+
+    <div class="music-widget" id="musicWidget">
+        <div class="music-icon"></div>
+        <div class="music-info">
+            <div class="music-name glitch-text">free bands</div>
+            <div class="music-status" id="mStatus">Paused</div>
+        </div>
+    </div>
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <div class="load-text">Loading Assets...</div>
+    </div>
+
+    <div id="mainContent">
+        <div class="avatar seq-item" style="animation-delay: 0.1s;"></div>
+        <h1 class="name seq-item" style="animation-delay: 0.3s;"><span class="glitch-text">Morpheusov.qmor</span></h1>
+        <div class="username seq-item" style="animation-delay: 0.45s;"><span class="glitch-text">@Defbymorgenshtern</span></div>
+        <p class="bio seq-item" style="animation-delay: 0.6s;">не отвечаю на метавопросы | @doverie_2</p>
+
+        <div class="section-title seq-item" style="animation-delay: 0.7s;">Мои Проекты</div>
+        <div class="project-card seq-item" style="animation-delay: 0.8s;" onclick="window.open('https://t.me/doverie_2', '_blank')">
+            <div class="project-icon"></div>
+            <div class="project-info">
+                <div class="project-title-glitch"><span class="glitch-text">Project | white pengvin</span></div>
+                <div class="project-link">@doverie_2</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bgMusic" src="music.mp3" loop></audio>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        const audio = document.getElementById('bgMusic');
+        const widget = document.getElementById('musicWidget');
+        const statusText = document.getElementById('mStatus');
+
+        // РЕАЛЬНЫЙ ПРЕДЗАГРУЗЧИК
+        let assetsLoaded = 0;
+        const assetsToLoad = ['osnova.png', 'canal.png', 'iconmusic.png', 'music.mp3'];
+        
+        function checkLoading() {
+            assetsLoaded++;
+            if (assetsLoaded >= assetsToLoad.length) {
+                // Минимум 2 секунды для красоты, потом скрываем
+                setTimeout(showContent, 2000);
+            }
+        }
+
+        // Грузим картинки и аудио
+        assetsToLoad.forEach(src => {
+            if (src.endsWith('.mp3')) {
+                const a = new Audio(src);
+                a.oncanplaythrough = checkLoading;
+            } else {
+                const img = new Image();
+                img.src = src;
+                img.onload = checkLoading;
+                img.onerror = checkLoading; // Чтобы не зависло, если файла нет
+            }
+        });
+
+        function showContent() {
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                widget.classList.add('show');
+                const seqItems = document.querySelectorAll('.seq-item');
+                seqItems.forEach(item => item.classList.add('show'));
+            }, 800);
+        }
+
+        // АВТОПЛЕЙ ПОСЛЕ ТАПА
+        document.body.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                widget.classList.add('playing');
+                statusText.innerText = 'Now Playing';
+            }
+        }, { once: false });
+
+    </script>
+</body>
+</html>

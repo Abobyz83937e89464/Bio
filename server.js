@@ -2,17 +2,15 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const https = require('https');
 
-// Берем токен из переменных окружения Render
+// Берем токен из переменных окружения
 const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
 
-// Поднимаем Express сервер (Render требует, чтобы проект слушал порт)
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ссылка на твой сервис в Render (нужно добавить в Env Variables)
-// Пример: https://bio-bot-xyz.onrender.com
-const RENDER_URL = process.env.RENDER_URL; 
+// Render автоматически подставляет сюда твою текущую ссылку хостинга
+const RENDER_URL = process.env.RENDER_EXTERNAL_URL; 
 
 app.get('/', (req, res) => {
     res.send('Bio Bot is running.');
@@ -21,15 +19,16 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
     
-    // Тот самый Cron Job (интервал). Пингуем сами себя каждые 14 минут
+    // Авто-пинг, чтобы бесплатный тариф не засыпал
     if (RENDER_URL) {
+        console.log(`Ping target set to: ${RENDER_URL}`);
         setInterval(() => {
             https.get(RENDER_URL).on('error', (err) => {
                 console.error("Ping failed:", err.message);
             });
-        }, 14 * 60 * 1000); // 14 минут в миллисекундах
+        }, 14 * 60 * 1000); // 14 минут
     } else {
-        console.log("RENDER_URL не указан, авто-пинг отключен.");
+        console.log("URL не найден, авто-пинг не работает.");
     }
 });
 

@@ -153,7 +153,6 @@
             box-shadow: 0 30px 60px rgba(0,0,0,0.4);
         }
 
-        /* Плавное появление/исчезновение главного контента */
         #mainContent {
             transition: opacity 0.5s ease, transform 0.5s var(--smooth-curve);
         }
@@ -169,33 +168,80 @@
 
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-        /* --- АНИМАЦИЯ КНОПОК --- */
-        .card, .contact-btn, .close-btn {
-            transition: transform 0.3s var(--smooth-curve), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        /* --- GLASS BUTTON --- */
+        .glass-button {
+            position: relative;
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 22px;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             cursor: pointer;
-            will-change: transform;
+            overflow: hidden;
             -webkit-user-select: none;
             user-select: none;
         }
 
-        .card:active, .contact-btn:active {
-            transform: scale(0.95);
-            background: rgba(255,255,255,0.08);
-            transition: transform 0.1s ease, background 0.1s ease;
+        @media (hover: hover) {
+            .glass-button:hover {
+                background: rgba(255, 255, 255, 0.12);
+                backdrop-filter: blur(15px);
+                -webkit-backdrop-filter: blur(15px);
+                letter-spacing: 4px;
+                border-color: rgba(255, 255, 255, 0.3);
+                transform: translateY(-2px);
+            }
         }
 
-        .close-btn:active {
-            transform: scale(0.9);
-            transition: transform 0.1s ease;
+        .glass-button:active {
+            transform: scale(0.95) translateY(0);
+            background: rgba(255, 255, 255, 0.08);
+            letter-spacing: 2px;
+            transition: all 0.1s ease;
+        }
+
+        /* --- КАРТОЧКИ --- */
+        .card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 22px;
+            text-align: left;
+            margin-bottom: 12px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         @media (hover: hover) {
-            .card:hover, .contact-btn:hover {
-                background: rgba(255,255,255,0.06);
-                transform: translateY(-3px);
-                border-color: rgba(255,255,255,0.2);
-                box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            .card:hover {
+                background: rgba(255, 255, 255, 0.12);
+                backdrop-filter: blur(15px);
+                -webkit-backdrop-filter: blur(15px);
+                border-color: rgba(255, 255, 255, 0.3);
+                transform: translateY(-2px);
             }
+        }
+
+        .card:active {
+            transform: scale(0.95) translateY(0);
+            background: rgba(255, 255, 255, 0.08);
+            transition: all 0.1s ease;
         }
 
         /* --- ЭЛЕМЕНТЫ ПРОФИЛЯ --- */
@@ -212,38 +258,10 @@
             letter-spacing: 2.5px;
             margin: 20px 0 12px 0;
         }
-        
-        .card {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 18px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--glass-border);
-            border-radius: 22px;
-            text-align: left;
-            margin-bottom: 12px;
-        }
 
         .card-icon { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--glass-border); flex-shrink: 0; }
         .card-title { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
         .card-desc { font-size: 12px; color: var(--text-muted); }
-
-        .contact-btn {
-            display: block;
-            width: 100%;
-            padding: 18px;
-            margin-top: 15px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%);
-            border: 1px solid var(--glass-border);
-            border-radius: 22px;
-            color: #fff;
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-decoration: none;
-        }
 
         /* --- МОДАЛЬНОЕ ОКНО ДРУГА --- */
         #friendModal {
@@ -278,12 +296,6 @@
 
         .close-btn { 
             margin-top: 25px;
-            font-size: 11px;
-            font-weight: 800;
-            color: rgba(255,255,255,0.3);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            padding: 10px;
         }
 
         /* --- ЛОАДЕР --- */
@@ -357,7 +369,7 @@
             </div>
         </div>
 
-        <div class="contact-btn seq-item" style="animation-delay: 0.9s;" onclick="window.open('https://t.me/Defbymorgenshtern', '_blank')">
+        <div class="glass-button seq-item" style="animation-delay: 0.9s; margin-top: 15px;" onclick="window.open('https://t.me/Defbymorgenshtern', '_blank')">
             Перейти в ЛС
         </div>
     </div>
@@ -378,7 +390,7 @@
                 </div>
             </div>
             
-            <div class="close-btn" onclick="closeFriendModal()">[ Вернуться назад ]</div>
+            <div class="glass-button close-btn" onclick="closeFriendModal()">[ Вернуться назад ]</div>
         </div>
     </div>
 
@@ -393,20 +405,14 @@
         const friendModal = document.getElementById('friendModal');
 
         function openFriendModal() {
-            // Плавно скрываем главный контент
             mainContent.classList.add('fade-out');
-            
-            // Ждём пока пропадёт, потом показываем модалку друга
             setTimeout(() => {
                 friendModal.classList.add('active');
             }, 400);
         }
 
         function closeFriendModal() {
-            // Плавно скрываем модалку друга
             friendModal.classList.remove('active');
-            
-            // Ждём пока пропадёт, потом возвращаем главный контент
             setTimeout(() => {
                 mainContent.classList.remove('fade-out');
             }, 400);

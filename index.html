@@ -13,7 +13,6 @@
             --text-main: #ffffff;
             --text-muted: rgba(255, 255, 255, 0.6);
             --accent-gray: rgba(255, 255, 255, 0.03);
-            /* Плавная кривая для анимаций */
             --smooth-curve: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -21,7 +20,7 @@
 
         body {
             height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
             font-family: 'Inter', sans-serif;
             background: #050505;
             color: var(--text-main);
@@ -55,113 +54,115 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* МУЗЫКАЛЬНЫЙ ПЛЕЕР */
+        /* МУЗЫКАЛЬНЫЙ ПЛЕЕР (ВОЗВРАТ ПОЛОСОК) */
         .music-widget {
             position: fixed; top: 25px; right: 25px; z-index: 50;
             background: var(--glass-bg); border: 1px solid var(--glass-border);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            padding: 14px 22px; border-radius: 22px;
-            display: flex; align-items: center; gap: 16px;
-            min-width: 240px; opacity: 0; transform: translateY(-10px);
+            padding: 16px 24px; border-radius: 25px;
+            display: flex; align-items: center; gap: 18px;
+            min-width: 250px; opacity: 0; transform: translateY(-10px);
             transition: all 1s var(--smooth-curve);
         }
         .music-widget.show { opacity: 1; transform: translateY(0); }
         .music-icon {
-            width: 50px; height: 50px; border-radius: 50%;
+            width: 55px; height: 55px; border-radius: 50%;
             background: url('iconmusic.png') center/cover;
-            border: 1px solid var(--glass-border);
-            animation: rotateDisk 5s linear infinite;
+            border: 2px solid var(--glass-border);
+            animation: rotateDisk 4s linear infinite;
             animation-play-state: paused; flex-shrink: 0;
         }
         .playing .music-icon { animation-play-state: running; }
         
-        .wave-container { display: flex; align-items: flex-end; gap: 3px; height: 14px; }
-        .bar { width: 3px; background: #fff; border-radius: 1px; height: 2px; }
-        .playing .bar { animation: dance 1.2s ease-in-out infinite; }
-        @keyframes dance { 0%, 100% { height: 2px; } 50% { height: 14px; } }
+        .wave-container { display: flex; align-items: flex-end; gap: 3px; height: 16px; }
+        .bar { width: 4px; background: #fff; border-radius: 1.5px; height: 2px; }
+        .playing .bar { animation: dance 1s ease-in-out infinite; }
+        @keyframes dance { 0%, 100% { height: 2px; } 50% { height: 16px; } }
         @keyframes rotateDisk { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         /* КОНТЕЙНЕР */
         #mainContent {
             position: relative; z-index: 10; width: 92%; max-width: 380px;
-            padding: 45px 25px; background: var(--glass-bg);
+            padding: 40px 25px; background: var(--glass-bg);
             backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border); border-radius: 35px;
             text-align: center; display: none;
             box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            max-height: 90vh; overflow-y: auto;
         }
+        #mainContent::-webkit-scrollbar { width: 0; }
+
         .seq-item { opacity: 0; transform: translateY(30px); }
-        .seq-item.show { animation: fadeInUp 1s var(--smooth-curve) forwards; }
+        .seq-item.show { animation: fadeInUp 0.8s var(--smooth-curve) forwards; }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
         /* АВАТАРКА */
         .avatar {
             width: 95px; height: 95px; border-radius: 50%;
             background: url('osnova.png') center/130% no-repeat; 
-            border: 1px solid var(--glass-border); margin: 0 auto 25px auto;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border); margin: 0 auto 20px auto;
         }
-        .name { font-size: 23px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.5px; }
-        .username { font-size: 17px; font-weight: 600; margin-bottom: 14px; display: block; opacity: 0.9; }
+        .name { font-size: 23px; font-weight: 800; margin-bottom: 4px; }
+        .username { font-size: 17px; font-weight: 600; margin-bottom: 12px; display: block; }
         .glitch-text {
-            display: inline-block; background: linear-gradient(90deg, #fff 0%, #777 50%, #fff 100%);
+            display: inline-block; background: linear-gradient(90deg, #fff 0%, #666 50%, #fff 100%);
             background-size: 200% auto; color: transparent; -webkit-background-clip: text;
-            animation: shimmer 4s linear infinite;
+            animation: shimmer 3s linear infinite;
         }
         @keyframes shimmer { to { background-position: 200% center; } }
-        .bio { font-size: 14px; color: var(--text-muted); margin-bottom: 35px; line-height: 1.5; }
+        .bio { font-size: 13px; color: var(--text-muted); margin-bottom: 25px; }
 
-        /* ПРОЕКТЫ & КНОПКА (УЛУЧШЕННАЯ АНИМАЦИЯ) */
-        .section-title { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 18px; }
+        /* КАРТОЧКИ (ПРОЕКТЫ & ДРУЗЬЯ) */
+        .section-title { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 2px; margin: 20px 0 12px 0; }
         
-        .project-card, .contact-btn {
-            transition: all 0.6s var(--smooth-curve);
-            will-change: transform, box-shadow;
-        }
-
-        .project-card {
-            display: flex; align-items: center; gap: 16px; padding: 18px;
+        .card {
+            display: flex; align-items: center; gap: 14px; padding: 16px;
             background: var(--accent-gray); border: 1px solid var(--glass-border);
             border-radius: 22px; text-align: left; cursor: pointer;
+            transition: all 0.5s var(--smooth-curve);
+            margin-bottom: 10px;
         }
         
-        .project-card:hover {
+        .card:hover {
             background: rgba(255,255,255,0.08);
-            transform: translateY(-5px);
+            transform: translateY(-4px);
             border-color: rgba(255,255,255,0.25);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
 
-        .project-card:active {
-            transform: translateY(-2px) scale(0.97);
+        .card:active {
+            transform: scale(0.95);
             background: rgba(255,255,255,0.12);
             transition: all 0.2s var(--smooth-curve);
         }
 
-        .project-icon { width: 48px; height: 48px; border-radius: 50%; background: url('canal.png') center/cover; border: 1px solid var(--glass-border); flex-shrink: 0; }
-        .project-title-glitch { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
-        .project-link { font-size: 12px; color: rgba(255,255,255,0.4); }
+        .card-icon { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--glass-border); flex-shrink: 0; }
+        .card-info { flex-grow: 1; }
+        .card-title { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+        .card-desc { font-size: 12px; color: var(--text-muted); line-height: 1.3; }
 
-        /* КНОПКА СВЯЗИ */
+        /* КНОПКА ЛС */
         .contact-btn {
-            display: block; width: 100%; padding: 18px; margin-top: 25px;
+            display: block; width: 100%; padding: 18px; margin-top: 15px;
             background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%);
             border: 1px solid var(--glass-border); border-radius: 22px;
             color: var(--text-main); font-size: 12px; font-weight: 800;
             text-transform: uppercase; letter-spacing: 2.5px; text-decoration: none;
+            transition: all 0.5s var(--smooth-curve);
         }
 
         .contact-btn:hover {
             background: rgba(255,255,255,0.1);
-            transform: translateY(-5px);
+            transform: translateY(-4px);
             border-color: rgba(255,255,255,0.3);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
 
         .contact-btn:active {
-            transform: translateY(-2px) scale(0.96);
+            transform: scale(0.95);
             transition: all 0.2s var(--smooth-curve);
         }
+
+        /* СПЕЦИФИКА КЕНТОВ */
+        .friend-avatar { width: 46px; height: 46px; border-radius: 50%; margin-bottom: 5px; border: 1px solid var(--glass-border); }
     </style>
 </head>
 <body>
@@ -184,20 +185,29 @@
 
     <div id="mainContent">
         <div class="avatar seq-item" style="animation-delay: 0.1s;"></div>
-        <h1 class="name seq-item" style="animation-delay: 0.25s;"><span class="glitch-text">Morpheusov.qmor</span></h1>
-        <div class="username seq-item" style="animation-delay: 0.4s;"><span class="glitch-text">@Defbymorgenshtern</span></div>
-        <p class="bio seq-item" style="animation-delay: 0.55s;">не отвечаю на метавопросы | @doverie_2</p>
+        <h1 class="name seq-item" style="animation-delay: 0.2s;"><span class="glitch-text">Morpheusov.qmor</span></h1>
+        <div class="username seq-item" style="animation-delay: 0.3s;"><span class="glitch-text">@Defbymorgenshtern</span></div>
+        <p class="bio seq-item" style="animation-delay: 0.4s;">не отвечаю на метавопросы | @doverie_2</p>
 
-        <div class="section-title seq-item" style="animation-delay: 0.7s;">Мои Проекты</div>
-        <div class="project-card seq-item" style="animation-delay: 0.85s;" onclick="window.open('https://t.me/doverie_2', '_blank')">
-            <div class="project-icon"></div>
-            <div class="project-info">
-                <div class="project-title-glitch"><span class="glitch-text">Project | white pengvin</span></div>
-                <div class="project-link">@doverie_2</div>
+        <div class="section-title seq-item" style="animation-delay: 0.5s;">Мои Проекты</div>
+        <div class="card seq-item" style="animation-delay: 0.6s;" onclick="window.open('https://t.me/doverie_2', '_blank')">
+            <div class="card-icon" style="background: url('canal.png') center/cover;"></div>
+            <div class="card-info">
+                <div class="card-title">Project | white pengvin</div>
+                <div class="card-desc">@doverie_2</div>
             </div>
         </div>
 
-        <div class="contact-btn seq-item" style="animation-delay: 1s;" onclick="window.open('https://t.me/Defbymorgenshtern', '_blank')">
+        <div class="section-title seq-item" style="animation-delay: 0.7s;">Кенты</div>
+        <div class="card seq-item" style="animation-delay: 0.8s;" onclick="window.open('https://t.me/deluxgran', '_blank')">
+            <div class="card-icon" style="background: url('avadruna.png') center/cover;"></div>
+            <div class="card-info">
+                <div class="card-title">арт333р (@suauis)</div>
+                <div class="card-desc">люблю москву но снится биробиджан | Бомж</div>
+            </div>
+        </div>
+
+        <div class="contact-btn seq-item" style="animation-delay: 0.9s;" onclick="window.open('https://t.me/Defbymorgenshtern', '_blank')">
             Перейти в ЛС
         </div>
     </div>
@@ -212,7 +222,7 @@
         const widget = document.getElementById('musicWidget');
 
         let assetsLoaded = 0;
-        const assetsToLoad = ['osnova.png', 'canal.png', 'iconmusic.png', 'music.mp3'];
+        const assetsToLoad = ['osnova.png', 'canal.png', 'iconmusic.png', 'music.mp3', 'druncanal.png', 'avadruna.png'];
         
         function checkLoading() {
             assetsLoaded++;

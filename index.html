@@ -168,49 +168,6 @@
 
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-        /* --- GLASS BUTTON --- */
-        .glass-button {
-            position: relative;
-            display: block;
-            width: 100%;
-            padding: 18px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 22px;
-            color: #ffffff;
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-align: center;
-            text-decoration: none;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            cursor: pointer;
-            overflow: hidden;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        @media (hover: hover) {
-            .glass-button:hover {
-                background: rgba(255, 255, 255, 0.12);
-                backdrop-filter: blur(15px);
-                -webkit-backdrop-filter: blur(15px);
-                letter-spacing: 4px;
-                border-color: rgba(255, 255, 255, 0.3);
-                transform: translateY(-2px);
-            }
-        }
-
-        .glass-button:active {
-            transform: scale(0.95) translateY(0);
-            background: rgba(255, 255, 255, 0.08);
-            letter-spacing: 2px;
-            transition: all 0.1s ease;
-        }
-
         /* --- OUTLINE BUTTON --- */
         .outline-button {
             position: relative;
@@ -421,7 +378,7 @@
             </div>
         </div>
 
-        <div class="glass-button seq-item" style="animation-delay: 0.9s; margin-top: 15px;" onclick="window.open('https://t.me/Defbymorgenshtern', '_blank')">
+        <div class="outline-button seq-item" style="animation-delay: 0.9s; margin-top: 15px;" onclick="window.open('https://t.me/Defbymorgenshtern', '_blank')">
             Перейти в ЛС
         </div>
     </div>
@@ -500,4 +457,4 @@
         }, { once: false });
     </script>
 </body>
-    </html>
+</html>

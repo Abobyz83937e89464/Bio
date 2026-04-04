@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bio Web App - Morpheusov</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="[telegram.org](https://telegram.org/js/telegram-web-app.js)"></script>
+    <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap)" rel="stylesheet">
     <style>
         :root {
             --glass-bg: rgba(255, 255, 255, 0.05);
@@ -34,7 +34,6 @@
             justify-content: center;
         }
 
-        /* --- ФОНОВЫЕ ЭФФЕКТЫ --- */
         .bg {
             position: fixed;
             width: 100%;
@@ -59,7 +58,6 @@
             100% { transform: translate(40px, 50px) scale(1.15); }
         }
 
-        /* --- ГЛИТЧ И ПЕРЕЛИВАНИЕ --- */
         .glitch-text {
             display: inline-block;
             background: linear-gradient(90deg, #fff 0%, #777 50%, #fff 100%);
@@ -121,9 +119,15 @@
             background: #fff;
             border-radius: 1.5px;
             height: 2px;
+            animation: none;
         }
 
-        .playing .bar { animation: dance 1s ease-in-out infinite; }
+        /* Полоски по очереди с задержкой */
+        .playing .bar:nth-child(1) { animation: dance 1s ease-in-out infinite 0s; }
+        .playing .bar:nth-child(2) { animation: dance 1s ease-in-out infinite 0.2s; }
+        .playing .bar:nth-child(3) { animation: dance 1s ease-in-out infinite 0.4s; }
+        .playing .bar:nth-child(4) { animation: dance 1s ease-in-out infinite 0.6s; }
+        .playing .bar:nth-child(5) { animation: dance 1s ease-in-out infinite 0.8s; }
 
         @keyframes dance {
             0%, 100% { height: 2px; }
@@ -219,20 +223,23 @@
             text-decoration: none;
         }
 
-        /* --- МОДАЛЬНОЕ ОКНО ДРУГА --- */
-        #friendModal {
+        /* --- СТРАНИЦА ДРУГА (плавный переход) --- */
+        #friendPage {
             position: fixed;
             inset: 0;
-            z-index: 100;
-            display: none;
+            z-index: 10;
+            display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(15px);
-            animation: fadeIn 0.4s ease;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #friendPage.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
 
         .close-btn { 
             margin-top: 25px;
@@ -298,7 +305,7 @@
         <p class="bio seq-item" style="animation-delay: 0.4s;">не отвечаю на метавопросы | @doverie_2</p>
 
         <div class="section-title seq-item" style="animation-delay: 0.5s;">Мои Проекты</div>
-        <div class="card seq-item" style="animation-delay: 0.6s;" onclick="window.open('https://t.me/doverie_2', '_blank')">
+        <div class="card seq-item" style="animation-delay: 0.6s;" onclick="window.open('[t.me](https://t.me/doverie_2)', '_blank')">
             <div class="card-icon" style="background: url('canal.png') center/cover;"></div>
             <div class="card-info">
                 <div class="card-title"><span class="glitch-text">Project | white pengvin</span></div>
@@ -307,7 +314,7 @@
         </div>
 
         <div class="section-title seq-item" style="animation-delay: 0.7s;">Кенты</div>
-        <div class="card seq-item" style="animation-delay: 0.8s;" onclick="openFriendModal()">
+        <div class="card seq-item" style="animation-delay: 0.8s;" onclick="openFriendPage()">
             <div class="card-icon" style="background: url('avadruna.png') center/cover;"></div>
             <div class="card-info">
                 <div class="card-title">арт333р</div>
@@ -315,12 +322,13 @@
             </div>
         </div>
 
-        <div class="contact-btn seq-item" style="animation-delay: 0.9s;" onclick="window.open('https://t.me/Defbymorgenshtern', '_blank')">
+        <div class="contact-btn seq-item" style="animation-delay: 0.9s;" onclick="window.open('[t.me](https://t.me/Defbymorgenshtern)', '_blank')">
             Перейти в ЛС
         </div>
     </div>
 
-    <div id="friendModal">
+    <!-- Страница друга -->
+    <div id="friendPage">
         <div class="friend-card-full">
             <div class="avatar" style="background: url('avadruna.png') center/cover;"></div>
             <h1 class="name"><span class="glitch-text">арт333р</span></h1>
@@ -328,7 +336,7 @@
             <p class="bio">люблю москву но снится биробиджан</p>
             
             <div class="section-title">Канал кента</div>
-            <div class="card" onclick="window.open('https://t.me/deluxgran', '_blank')">
+            <div class="card" onclick="window.open('[t.me](https://t.me/deluxgran)', '_blank')">
                 <div class="card-icon" style="background: url('druncanal.png') center/cover;"></div>
                 <div class="card-info">
                     <div class="card-title"><span class="glitch-text">Бомж</span></div>
@@ -336,7 +344,7 @@
                 </div>
             </div>
             
-            <div class="close-btn" onclick="closeFriendModal()">[ Вернуться назад ]</div>
+            <div class="close-btn" onclick="closeFriendPage()">[ Вернуться назад ]</div>
         </div>
     </div>
 
@@ -347,9 +355,34 @@
         tg.expand();
         const audio = document.getElementById('bgMusic');
         const widget = document.getElementById('musicWidget');
+        const mainContent = document.getElementById('mainContent');
+        const friendPage = document.getElementById('friendPage');
 
-        function openFriendModal() { document.getElementById('friendModal').style.display = 'flex'; }
-        function closeFriendModal() { document.getElementById('friendModal').style.display = 'none'; }
+        function openFriendPage() {
+            // Плавно скрываем основной контент
+            mainContent.style.transition = 'opacity 0.4s ease';
+            mainContent.style.opacity = '0';
+            mainContent.style.pointerEvents = 'none';
+            setTimeout(() => {
+                mainContent.style.display = 'none';
+                friendPage.classList.add('visible');
+            }, 400);
+        }
+
+        function closeFriendPage() {
+            // Плавно скрываем страницу друга
+            friendPage.classList.remove('visible');
+            setTimeout(() => {
+                mainContent.style.display = 'block';
+                // Небольшая пауза чтобы display:block применился
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        mainContent.style.opacity = '1';
+                        mainContent.style.pointerEvents = 'all';
+                    });
+                });
+            }, 400);
+        }
 
         let assetsLoaded = 0;
         const assets = ['osnova.png', 'canal.png', 'iconmusic.png', 'music.mp3', 'druncanal.png', 'avadruna.png'];
@@ -368,7 +401,8 @@
             document.getElementById('loader').style.opacity = '0';
             setTimeout(() => {
                 document.getElementById('loader').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
+                mainContent.style.display = 'block';
+                mainContent.style.opacity = '1';
                 widget.style.opacity = '1';
                 widget.style.transform = 'translateY(0)';
                 document.querySelectorAll('.seq-item').forEach(el => el.classList.add('show'));

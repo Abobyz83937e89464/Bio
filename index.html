@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bio Web App - Morpheusov</title>
-    <script src="[telegram.org](https://telegram.org/js/telegram-web-app.js)"></script>
-    <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap)" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --glass-bg: rgba(255, 255, 255, 0.05);
@@ -34,6 +34,7 @@
             justify-content: center;
         }
 
+        /* --- ФОНОВЫЕ ЭФФЕКТЫ --- */
         .bg {
             position: fixed;
             width: 100%;
@@ -58,6 +59,7 @@
             100% { transform: translate(40px, 50px) scale(1.15); }
         }
 
+        /* --- ГЛИТЧ И ПЕРЕЛИВАНИЕ --- */
         .glitch-text {
             display: inline-block;
             background: linear-gradient(90deg, #fff 0%, #777 50%, #fff 100%);
@@ -119,15 +121,14 @@
             background: #fff;
             border-radius: 1.5px;
             height: 2px;
-            animation: none;
         }
 
-        /* Полоски по очереди с задержкой */
-        .playing .bar:nth-child(1) { animation: dance 1s ease-in-out infinite 0s; }
-        .playing .bar:nth-child(2) { animation: dance 1s ease-in-out infinite 0.2s; }
-        .playing .bar:nth-child(3) { animation: dance 1s ease-in-out infinite 0.4s; }
-        .playing .bar:nth-child(4) { animation: dance 1s ease-in-out infinite 0.6s; }
-        .playing .bar:nth-child(5) { animation: dance 1s ease-in-out infinite 0.8s; }
+        .playing .bar { animation: dance 1s ease-in-out infinite; }
+        .playing .bar:nth-child(1) { animation-delay: 0.0s; animation-duration: 0.8s; }
+        .playing .bar:nth-child(2) { animation-delay: 0.15s; animation-duration: 0.65s; }
+        .playing .bar:nth-child(3) { animation-delay: 0.05s; animation-duration: 0.9s; }
+        .playing .bar:nth-child(4) { animation-delay: 0.25s; animation-duration: 0.7s; }
+        .playing .bar:nth-child(5) { animation-delay: 0.1s; animation-duration: 0.85s; }
 
         @keyframes dance {
             0%, 100% { height: 2px; }
@@ -152,6 +153,17 @@
             box-shadow: 0 30px 60px rgba(0,0,0,0.4);
         }
 
+        /* Плавное появление/исчезновение главного контента */
+        #mainContent {
+            transition: opacity 0.5s ease, transform 0.5s var(--smooth-curve);
+        }
+
+        #mainContent.fade-out {
+            opacity: 0;
+            transform: scale(0.96) translateY(10px);
+            pointer-events: none;
+        }
+
         .seq-item { opacity: 0; transform: translateY(30px); }
         .seq-item.show { animation: fadeInUp 0.8s var(--smooth-curve) forwards; }
 
@@ -159,21 +171,31 @@
 
         /* --- АНИМАЦИЯ КНОПОК --- */
         .card, .contact-btn, .close-btn {
-            transition: transform 0.4s var(--smooth-curve), background 0.3s ease, border-color 0.3s ease, box-shadow 0.4s ease;
+            transition: transform 0.3s var(--smooth-curve), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
             will-change: transform;
-        }
-
-        .card:hover, .contact-btn:hover {
-            background: rgba(255,255,255,0.08);
-            transform: translateY(-5px);
-            border-color: rgba(255,255,255,0.25);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .card:active, .contact-btn:active {
-            transform: scale(0.92) translateY(2px);
-            transition: transform 0.1s var(--smooth-curve);
+            transform: scale(0.95);
+            background: rgba(255,255,255,0.08);
+            transition: transform 0.1s ease, background 0.1s ease;
+        }
+
+        .close-btn:active {
+            transform: scale(0.9);
+            transition: transform 0.1s ease;
+        }
+
+        @media (hover: hover) {
+            .card:hover, .contact-btn:hover {
+                background: rgba(255,255,255,0.06);
+                transform: translateY(-3px);
+                border-color: rgba(255,255,255,0.2);
+                box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            }
         }
 
         /* --- ЭЛЕМЕНТЫ ПРОФИЛЯ --- */
@@ -223,22 +245,35 @@
             text-decoration: none;
         }
 
-        /* --- СТРАНИЦА ДРУГА (плавный переход) --- */
-        #friendPage {
+        /* --- МОДАЛЬНОЕ ОКНО ДРУГА --- */
+        #friendModal {
             position: fixed;
             inset: 0;
-            z-index: 10;
+            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(15px);
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.5s ease;
         }
 
-        #friendPage.visible {
+        #friendModal.active {
             opacity: 1;
             pointer-events: all;
+        }
+
+        #friendModal .friend-card-full {
+            transform: scale(0.92) translateY(20px);
+            opacity: 0;
+            transition: transform 0.5s var(--smooth-curve), opacity 0.5s ease;
+        }
+
+        #friendModal.active .friend-card-full {
+            transform: scale(1) translateY(0);
+            opacity: 1;
         }
 
         .close-btn { 
@@ -305,7 +340,7 @@
         <p class="bio seq-item" style="animation-delay: 0.4s;">не отвечаю на метавопросы | @doverie_2</p>
 
         <div class="section-title seq-item" style="animation-delay: 0.5s;">Мои Проекты</div>
-        <div class="card seq-item" style="animation-delay: 0.6s;" onclick="window.open('[t.me](https://t.me/doverie_2)', '_blank')">
+        <div class="card seq-item" style="animation-delay: 0.6s;" onclick="window.open('https://t.me/doverie_2', '_blank')">
             <div class="card-icon" style="background: url('canal.png') center/cover;"></div>
             <div class="card-info">
                 <div class="card-title"><span class="glitch-text">Project | white pengvin</span></div>
@@ -314,7 +349,7 @@
         </div>
 
         <div class="section-title seq-item" style="animation-delay: 0.7s;">Кенты</div>
-        <div class="card seq-item" style="animation-delay: 0.8s;" onclick="openFriendPage()">
+        <div class="card seq-item" style="animation-delay: 0.8s;" onclick="openFriendModal()">
             <div class="card-icon" style="background: url('avadruna.png') center/cover;"></div>
             <div class="card-info">
                 <div class="card-title">арт333р</div>
@@ -322,13 +357,12 @@
             </div>
         </div>
 
-        <div class="contact-btn seq-item" style="animation-delay: 0.9s;" onclick="window.open('[t.me](https://t.me/Defbymorgenshtern)', '_blank')">
+        <div class="contact-btn seq-item" style="animation-delay: 0.9s;" onclick="window.open('https://t.me/Defbymorgenshtern', '_blank')">
             Перейти в ЛС
         </div>
     </div>
 
-    <!-- Страница друга -->
-    <div id="friendPage">
+    <div id="friendModal">
         <div class="friend-card-full">
             <div class="avatar" style="background: url('avadruna.png') center/cover;"></div>
             <h1 class="name"><span class="glitch-text">арт333р</span></h1>
@@ -336,7 +370,7 @@
             <p class="bio">люблю москву но снится биробиджан</p>
             
             <div class="section-title">Канал кента</div>
-            <div class="card" onclick="window.open('[t.me](https://t.me/deluxgran)', '_blank')">
+            <div class="card" onclick="window.open('https://t.me/deluxgran', '_blank')">
                 <div class="card-icon" style="background: url('druncanal.png') center/cover;"></div>
                 <div class="card-info">
                     <div class="card-title"><span class="glitch-text">Бомж</span></div>
@@ -344,7 +378,7 @@
                 </div>
             </div>
             
-            <div class="close-btn" onclick="closeFriendPage()">[ Вернуться назад ]</div>
+            <div class="close-btn" onclick="closeFriendModal()">[ Вернуться назад ]</div>
         </div>
     </div>
 
@@ -356,31 +390,25 @@
         const audio = document.getElementById('bgMusic');
         const widget = document.getElementById('musicWidget');
         const mainContent = document.getElementById('mainContent');
-        const friendPage = document.getElementById('friendPage');
+        const friendModal = document.getElementById('friendModal');
 
-        function openFriendPage() {
-            // Плавно скрываем основной контент
-            mainContent.style.transition = 'opacity 0.4s ease';
-            mainContent.style.opacity = '0';
-            mainContent.style.pointerEvents = 'none';
+        function openFriendModal() {
+            // Плавно скрываем главный контент
+            mainContent.classList.add('fade-out');
+            
+            // Ждём пока пропадёт, потом показываем модалку друга
             setTimeout(() => {
-                mainContent.style.display = 'none';
-                friendPage.classList.add('visible');
+                friendModal.classList.add('active');
             }, 400);
         }
 
-        function closeFriendPage() {
-            // Плавно скрываем страницу друга
-            friendPage.classList.remove('visible');
+        function closeFriendModal() {
+            // Плавно скрываем модалку друга
+            friendModal.classList.remove('active');
+            
+            // Ждём пока пропадёт, потом возвращаем главный контент
             setTimeout(() => {
-                mainContent.style.display = 'block';
-                // Небольшая пауза чтобы display:block применился
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        mainContent.style.opacity = '1';
-                        mainContent.style.pointerEvents = 'all';
-                    });
-                });
+                mainContent.classList.remove('fade-out');
             }, 400);
         }
 
@@ -402,7 +430,6 @@
             setTimeout(() => {
                 document.getElementById('loader').style.display = 'none';
                 mainContent.style.display = 'block';
-                mainContent.style.opacity = '1';
                 widget.style.opacity = '1';
                 widget.style.transform = 'translateY(0)';
                 document.querySelectorAll('.seq-item').forEach(el => el.classList.add('show'));

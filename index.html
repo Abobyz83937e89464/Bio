@@ -38,10 +38,10 @@
         .blob:nth-child(2) { width: 300px; height: 300px; background: #cccccc; bottom: 10%; right: -10%; animation-duration: 1.5s; }
         @keyframes moveFast { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(50px, 60px) scale(1.2); } }
 
-        /* ЗАГРУЗКА (ТЕПЕРЬ С ФОНОМ) */
+        /* ЗАГРУЗКА */
         #loader {
             position: fixed; inset: 0; 
-            background: rgba(5, 5, 5, 0.85); /* Полупрозрачный, чтобы видеть фон */
+            background: rgba(5, 5, 5, 0.85);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             z-index: 100;
             display: flex; align-items: center; justify-content: center;
@@ -53,20 +53,20 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* МУЗЫКАЛЬНЫЙ ПЛЕЕР (ЕЩЕ БОЛЬШЕ) */
+        /* МУЗЫКАЛЬНЫЙ ПЛЕЕР */
         .music-widget {
             position: fixed; top: 25px; right: 25px; z-index: 50;
             background: var(--glass-bg); border: 1px solid var(--glass-border);
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            padding: 16px 24px; /* Больше отступы */
+            padding: 16px 24px;
             border-radius: 25px;
-            display: flex; align-items: center; gap: 18px; /* Больше зазор */
-            min-width: 250px; /* Больше ширина */
+            display: flex; align-items: center; gap: 18px;
+            min-width: 250px;
             opacity: 0; transform: translateX(20px); transition: 0.8s ease;
         }
         .music-widget.show { opacity: 1; transform: translateX(0); }
         .music-icon {
-            width: 55px; height: 55px; /* Больше иконка */
+            width: 55px; height: 55px;
             border-radius: 50%;
             background: url('iconmusic.png') center/cover;
             border: 2px solid var(--glass-border);
@@ -76,12 +76,12 @@
         }
         .playing .music-icon { animation-play-state: running; }
         .music-info { display: flex; flex-direction: column; flex-grow: 1; }
-        .music-name { font-size: 15px; font-weight: 800; margin-bottom: 6px; } /* Больше текст */
+        .music-name { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
         
         .wave-container {
-            display: flex; align-items: flex-end; gap: 3px; height: 16px; /* Выше полоски */
+            display: flex; align-items: flex-end; gap: 3px; height: 16px;
         }
-        .bar { width: 4px; background: #fff; border-radius: 1.5px; height: 2px; } /* Жирнее полоски */
+        .bar { width: 4px; background: #fff; border-radius: 1.5px; height: 2px; }
         .playing .bar { animation: dance 1s ease-in-out infinite; }
         .bar:nth-child(1) { animation-delay: 0.1s; }
         .bar:nth-child(2) { animation-delay: 0.3s; }
@@ -104,11 +104,10 @@
         .seq-item.show { animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-        /* АВАТАРКА (СБЛИЖЕНИЕ) */
+        /* АВАТАРКА */
         .avatar {
             width: 100px; height: 100px; border-radius: 50%;
-            /* ПРИБЛИЗИЛ КАРТИНКУ, ЧТОБЫ УБРАТЬ ПОЛОСКИ ПО КРАЯМ */
-            background: url('osnova.png') center/130% no-repeat; /* 130% масштаба */
+            background: url('osnova.png') center/130% no-repeat; 
             border: 2px solid var(--glass-border); margin: 0 auto 20px auto;
         }
         .name { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
@@ -133,6 +132,31 @@
         .project-icon { width: 50px; height: 50px; border-radius: 50%; background: url('canal.png') center/cover; border: 1px solid var(--glass-border); flex-shrink: 0; }
         .project-title-glitch { font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
         .project-link { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+        /* КНОПКА ПЕРЕЙТИ В ЛС */
+        .contact-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-top: 25px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .contact-btn:hover, .contact-btn:active {
+            background: rgba(255,255,255,0.1);
+            transform: scale(1.02) translateY(-2px);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -167,6 +191,10 @@
                 <div class="project-link">@doverie_2</div>
             </div>
         </div>
+
+        <div class="contact-btn seq-item" style="animation-delay: 0.9s;" onclick="window.open('https://t.me/Defbymorgenshtern', '_blank')">
+            Перейти в ЛС
+        </div>
     </div>
 
     <audio id="bgMusic" src="music.mp3" loop autoplay></audio>
@@ -183,13 +211,11 @@
         
         function checkLoading() {
             assetsLoaded++;
-            // Если всё загрузилось, сразу пробуем показать контент
             if (assetsLoaded >= assetsToLoad.length) {
-                setTimeout(showContent, 500); // Небольшая задержка для плавности
+                setTimeout(showContent, 500); 
             }
         }
 
-        // Страховочный таймер: если сеть тупит, через 5 сек всё равно покажем био
         const fallbackTimer = setTimeout(() => {
             if (document.getElementById('loader').style.display !== 'none') {
                 showContent();
@@ -204,12 +230,12 @@
                 const img = new Image();
                 img.src = src;
                 img.onload = checkLoading;
-                img.onerror = checkLoading; // Если иконки нет, не виснем
+                img.onerror = checkLoading; 
             }
         });
 
         function showContent() {
-            clearTimeout(fallbackTimer); // Отменяем страховку
+            clearTimeout(fallbackTimer);
             document.getElementById('loader').style.opacity = '0';
             
             setTimeout(() => {
@@ -218,7 +244,6 @@
                 widget.classList.add('show');
                 document.querySelectorAll('.seq-item').forEach(item => item.classList.add('show'));
                 
-                // Агрессивный запуск музыки
                 audio.play().then(() => {
                     widget.classList.add('playing');
                 }).catch(() => {
@@ -227,13 +252,12 @@
             }, 800);
         }
 
-        // Гарантированный запуск при любом клике/тапе
         document.body.addEventListener('click', () => {
             if (audio.paused) {
                 audio.play();
                 widget.classList.add('playing');
             }
-        }, { once: false }); // Пусть срабатывает всегда, если музыка на паузе
+        }, { once: false });
     </script>
 </body>
 </html>
